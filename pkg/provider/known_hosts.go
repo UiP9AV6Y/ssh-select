@@ -89,7 +89,7 @@ func ParseKnownHosts(file string, ignoreMalformed bool) ([]string, error) {
 func UserKnownHostsProvider() *KnownHostsProvider {
 	var provider *KnownHostsProvider
 
-	if file, err := util.UserFilePath(false, ".ssh", "config"); err == nil {
+	if file, err := util.UserFilePath(false, ".ssh", "known_hosts"); err == nil {
 		provider = &KnownHostsProvider{
 			file: file,
 		}
@@ -101,7 +101,7 @@ func UserKnownHostsProvider() *KnownHostsProvider {
 func ConfigKnownHostsProvider() *KnownHostsProvider {
 	var provider *KnownHostsProvider
 
-	if file, err := util.UserFilePath(true, "ssh", "config"); err == nil {
+	if file, err := util.UserFilePath(true, "ssh", "known_hosts"); err == nil {
 		provider = &KnownHostsProvider{
 			file: file,
 		}
