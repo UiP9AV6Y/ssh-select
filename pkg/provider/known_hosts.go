@@ -2,12 +2,18 @@ package provider
 
 import (
 	"bufio"
+	"bytes"
 	"os"
 
 	"golang.org/x/crypto/ssh"
 
 	"github.com/UiP9AV6Y/ssh-select/pkg/remote"
 	"github.com/UiP9AV6Y/ssh-select/pkg/util"
+)
+
+var (
+	hashed_indicator  = []byte("|")
+	comment_indicator = []byte("#")
 )
 
 type KnownHostsProvider struct {
@@ -19,7 +25,7 @@ func (p *KnownHostsProvider) String() string {
 }
 
 func (p *KnownHostsProvider) Parse() ([]remote.Host, error) {
-	hosts, err := ParseKnownHosts(p.file, false)
+	hosts, err := ParseKnownHosts(p.file, true)
 
 	if err != nil {
 		return nil, err
@@ -56,7 +62,15 @@ func ParseKnownHosts(file string, ignoreMalformed bool) ([]string, error) {
 
 	scanner := bufio.NewScanner(fd)
 	for scanner.Scan() {
-		_, hosts, _, _, _, err = ssh.ParseKnownHosts(scanner.Bytes())
+		line := bytes.TrimSpace(scanner.Bytes())
+
+		if len(line) == 0 ||
+			bytes.HasPrefix(line, hashed_indicator) ||
+			bytes.HasPrefix(line, comment_indicator) {
+			continue
+		}
+
+		_, hosts, _, _, _, err = ssh.ParseKnownHosts(line)
 
 		if err == nil {
 			result = append(result, hosts...)
