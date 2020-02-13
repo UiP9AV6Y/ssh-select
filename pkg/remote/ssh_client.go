@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"syscall"
 
 	prompt "github.com/c-bata/go-prompt"
 
@@ -19,12 +20,7 @@ type SshClient struct {
 }
 
 func (c *SshClient) Connect(host Host) error {
-	// if err = syscall.Exec(c.cmd, c.CmdArray(host), c.env); err != nil {
-	//   return err
-	// }
-
-	os.Exit(0)
-	return nil
+	return syscall.Exec(c.cmd, c.CmdArray(host, true), c.env)
 }
 
 func (c *SshClient) NewExecutor() prompt.Executor {
@@ -36,8 +32,19 @@ func (c *SshClient) NewExecutor() prompt.Executor {
 			os.Exit(0)
 		}
 
+		if c.noop {
+			fmt.Println("Connecting to", host, "(NOOP)")
+			os.Exit(0)
+		}
+
 		fmt.Println("Connecting to", host)
-		c.Connect(Host(host))
+
+		if err := c.Connect(Host(host)); err != nil {
+			fmt.Println("Unable to connect:", err)
+			os.Exit(1)
+		}
+
+		os.Exit(0)
 	}
 
 	return executor
