@@ -125,7 +125,7 @@ func main() {
 	choice = prompt.New(
 		executor,
 		suggestions,
-		prompt.OptionPrefix(client.CmdLine("")),
+		prompt.OptionPrefix(client.String()),
 		prompt.OptionPrefixTextColor(prompt.DefaultColor),
 	)
 

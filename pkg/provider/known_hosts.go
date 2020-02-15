@@ -1,9 +1,11 @@
 package provider
 
 import (
+	"fmt"
 	"bufio"
 	"bytes"
 	"os"
+	"strconv"
 
 	"golang.org/x/crypto/ssh"
 
@@ -25,16 +27,76 @@ func (p *KnownHostsProvider) String() string {
 }
 
 func (p *KnownHostsProvider) Parse() ([]remote.Host, error) {
-	hosts, err := ParseKnownHosts(p.file, true)
+	var fd *os.File
+	var err error
 
+	fd, err = os.Open(p.file)
 	if err != nil {
 		return nil, err
 	}
+	defer fd.Close()
 
-	parsed := make([]remote.Host, len(hosts))
+	return p.parseFile(fd, true)
+}
 
-	for i := range hosts {
-		parsed[i] = remote.Host(hosts[i])
+func (p *KnownHostsProvider) parseFile(file *os.File, ignoreMalformed bool) ([]remote.Host, error) {
+	scanner := bufio.NewScanner(file)
+	result := []remote.Host {}
+	lineNo := 0
+
+	for scanner.Scan() {
+		line := bytes.TrimSpace(scanner.Bytes())
+		lineNo++
+
+		if len(line) == 0 ||
+			bytes.HasPrefix(line, hashed_indicator) ||
+			bytes.HasPrefix(line, comment_indicator) {
+			continue
+		}
+
+		if hosts, err := p.parseLine(line, ignoreMalformed); err == nil {
+			result = append(result, hosts...)
+		} else if !ignoreMalformed {
+			return nil, fmt.Errorf("Parse error on line %d in %s: %w", lineNo, file.Name(), err)
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (p *KnownHostsProvider) parseLine(line []byte, ignoreMalformed bool) (result []remote.Host, err error) {
+	var hosts []string
+
+	_, hosts, _, _, _, err = ssh.ParseKnownHosts(line)
+
+	if err != nil && !ignoreMalformed {
+		return nil, err
+	}
+
+	result = make([]remote.Host, len(hosts))
+
+	for i, host := range hosts {
+		if result[i], err = p.parseHost(host); err != nil {
+			if !ignoreMalformed {
+				return nil, err
+			}
+		}
+	}
+
+	return result, nil
+}
+
+func (p *KnownHostsProvider) parseHost(host string) (remote.Host, error) {
+	h := host
+	// TODO: parse port
+	n, _ := strconv.Atoi("0")
+	parsed := remote.Host {
+		Host: h,
+		Port: n,
 	}
 
 	return parsed, nil
@@ -46,44 +108,6 @@ func NewKnownHostsProvider(file string) *KnownHostsProvider {
 	}
 
 	return provider
-}
-
-func ParseKnownHosts(file string, ignoreMalformed bool) ([]string, error) {
-	var fd *os.File
-	var hosts []string
-	var err error
-	var result []string
-
-	fd, err = os.Open(file)
-	if err != nil {
-		return nil, err
-	}
-	defer fd.Close()
-
-	scanner := bufio.NewScanner(fd)
-	for scanner.Scan() {
-		line := bytes.TrimSpace(scanner.Bytes())
-
-		if len(line) == 0 ||
-			bytes.HasPrefix(line, hashed_indicator) ||
-			bytes.HasPrefix(line, comment_indicator) {
-			continue
-		}
-
-		_, hosts, _, _, _, err = ssh.ParseKnownHosts(line)
-
-		if err == nil {
-			result = append(result, hosts...)
-		} else if !ignoreMalformed {
-			return nil, err
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		return nil, err
-	}
-
-	return result, nil
 }
 
 func UserKnownHostsProvider() *KnownHostsProvider {
