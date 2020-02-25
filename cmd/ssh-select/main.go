@@ -72,7 +72,7 @@ func newSearch(providers []provider.HostProvider) (search.Search, map[string]int
 		sources[provider.String()] = len(hosts)
 
 		for _, host := range hosts {
-			lookup.Add(host)
+			lookup.Add(remote.NewData(&host))
 		}
 	}
 
@@ -111,7 +111,6 @@ func main() {
 	}
 
 	providers = newProviders(parser)
-	client = remote.NewSshClient(cmd, parser.SshArgv(), parser.Environment())
 
 	lookup, sources, err = newSearch(providers)
 	if err != nil {
@@ -119,8 +118,9 @@ func main() {
 		os.Exit(1)
 	}
 
+	client = remote.NewSshClient(cmd, parser.SshArgv(), parser.Environment())
 	complete = completer.NewCompleter(lookup)
-	executor = client.NewExecutor()
+	executor = client.NewExecutor(lookup, false)
 	suggestions = complete.NewSuggestions()
 	choice = prompt.New(
 		executor,

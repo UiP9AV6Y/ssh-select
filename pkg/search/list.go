@@ -1,12 +1,9 @@
 package search
 
 import (
+	"fmt"
 	"container/list"
 	"strings"
-
-	prompt "github.com/c-bata/go-prompt"
-
-	"github.com/UiP9AV6Y/ssh-select/pkg/remote"
 )
 
 type ListFilter func(s, substr string) bool
@@ -21,23 +18,35 @@ func (l *List) Len() int {
 	return l.length
 }
 
-func (l *List) Add(host remote.Host) {
-	l.container.PushBack(host.Suggest())
+func (l *List) Add(element fmt.Stringer) {
+	l.container.PushBack(element)
 	l.length++
 }
 
-func (l *List) Select(query string) []prompt.Suggest {
-	result := []prompt.Suggest{}
+func (l *List) Select(query string) []fmt.Stringer {
+	result := []fmt.Stringer{}
 
 	for e := l.container.Front(); e != nil; e = e.Next() {
-		v := e.Value.(prompt.Suggest)
+		v := e.Value.(fmt.Stringer)
 
-		if l.filter(v.Text, query) {
+		if l.filter(v.String(), query) {
 			result = append(result, v)
 		}
 	}
 
 	return result
+}
+
+func (l *List) Get(query string) (fmt.Stringer, bool) {
+	for e := l.container.Front(); e != nil; e = e.Next() {
+		v := e.Value.(fmt.Stringer)
+
+		if v.String() == query {
+			return v, true
+		}
+	}
+
+	return nil, false
 }
 
 func NewList(filter ListFilter) *List {

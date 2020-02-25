@@ -3,6 +3,7 @@ package completer
 import (
 	prompt "github.com/c-bata/go-prompt"
 
+	"github.com/UiP9AV6Y/ssh-select/pkg/remote"
 	"github.com/UiP9AV6Y/ssh-select/pkg/search"
 )
 
@@ -20,7 +21,14 @@ func (c *Completer) NewSuggestions() prompt.Completer {
 			return []prompt.Suggest{}
 		}
 
-		return c.lookup.Select(doc.GetWordBeforeCursor())
+		needles := c.lookup.Select(doc.GetWordBeforeCursor())
+		result := make([]prompt.Suggest, len(needles))
+
+		for i, needle := range needles {
+			result[i] = *needle.(*remote.Data).Suggestion
+		}
+
+		return result
 	}
 
 	return completer

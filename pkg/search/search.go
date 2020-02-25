@@ -1,16 +1,14 @@
 package search
 
-import (
-	prompt "github.com/c-bata/go-prompt"
-
-	"github.com/UiP9AV6Y/ssh-select/pkg/remote"
-)
+import "fmt"
 
 type Search interface {
-	// Add a host object to the search pool
-	Add(host remote.Host)
+	// Add an element to the search pool
+	Add(element fmt.Stringer)
 	// Find matches for the provided query
-	Select(query string) []prompt.Suggest
+	Select(query string) []fmt.Stringer
+	// Find the exact element
+	Get(query string) (fmt.Stringer, bool)
 	// Returns the number of elements
 	Len() int
 }

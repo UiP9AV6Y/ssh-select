@@ -9,11 +9,11 @@ import (
 
 	prompt "github.com/c-bata/go-prompt"
 
+	"github.com/UiP9AV6Y/ssh-select/pkg/search"
 	"github.com/UiP9AV6Y/ssh-select/pkg/util"
 )
 
 type SshClient struct {
-	noop   bool
 	cmd    string
 	config string
 	argv   []string
@@ -24,7 +24,7 @@ func (c *SshClient) Connect(host *Host) error {
 	return syscall.Exec(c.cmd, c.CmdArray(host, true), c.env)
 }
 
-func (c *SshClient) NewExecutor() prompt.Executor {
+func (c *SshClient) NewExecutor(lookup search.Search, noop bool) prompt.Executor {
 	executor := func(host string) {
 		var target *Host
 		var err error
@@ -36,14 +36,14 @@ func (c *SshClient) NewExecutor() prompt.Executor {
 			os.Exit(0)
 		}
 
-		target, err = ParseSuggestText(host)
-
-		if err != nil {
+		if value, ok := lookup.Get(host); ok {
+			target = value.(*Data).Host
+		} else if target, err = ParseHost(host); err != nil {
 			fmt.Println("Malformed connection target:", err)
 			os.Exit(2)
 		}
 
-		if c.noop {
+		if noop {
 			fmt.Println("Connecting to", target, "(NOOP)")
 			os.Exit(0)
 		}
@@ -76,11 +76,7 @@ func (c *SshClient) CmdArray(host *Host, full bool) []string {
 			s = append(s, "-p", strconv.Itoa(host.Port))
 		}
 
-		if "" != host.User {
-			s = append(s, fmt.Sprintf("%s@%s", host.User, host.Host))
-		} else {
-			s = append(s, host.Host)
-		}
+		s = append(s, host.String())
 	} else {
 		s = append(s, "")
 	}
@@ -104,7 +100,6 @@ func NewSshClient(cmd string, argv []string, env []string) *SshClient {
 	config, _ := util.UserFilePath(true, "ssh", "config")
 
 	client := &SshClient{
-		noop:   false,
 		config: config,
 		cmd:    cmd,
 		argv:   argv,

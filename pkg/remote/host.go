@@ -1,6 +1,7 @@
 package remote
 
 import (
+	"fmt"
 	"strconv"
 
 	prompt "github.com/c-bata/go-prompt"
@@ -13,6 +14,10 @@ type Host struct {
 }
 
 func (h *Host) String() string {
+	if "" != h.User {
+		return fmt.Sprintf("%s@%s", h.User, h.Host)
+	}
+
 	return h.Host
 }
 
@@ -22,7 +27,7 @@ func (h *Host) Suggest() prompt.Suggest {
 	}
 }
 
-func ParseSuggestText(text string) (*Host, error) {
+func ParseHost(text string) (*Host, error) {
 	// TODO: parse user/port
 	u := ""
 	h := text
