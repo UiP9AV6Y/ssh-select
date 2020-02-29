@@ -72,7 +72,7 @@ func newSearch(providers []provider.HostProvider) (search.Search, map[string]int
 		sources[provider.String()] = len(hosts)
 
 		for _, host := range hosts {
-			lookup.Add(remote.NewData(&host))
+			lookup.Add(remote.NewData(host))
 		}
 	}
 

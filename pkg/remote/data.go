@@ -1,7 +1,7 @@
 package remote
 
 import (
-	prompt "github.com/c-bata/go-prompt"
+	"github.com/c-bata/go-prompt"
 )
 
 type Data struct {
@@ -13,12 +13,12 @@ func (n *Data) String() string {
   return n.Suggestion.Text
 }
 
-func NewData(host *Host) *Data {
+func NewData(host Host) *Data {
 	suggestion := &prompt.Suggest{
 		Text: host.Host,
 	}
   needle := &Data{
-    Host: host,
+    Host: &host,
     Suggestion: suggestion,
   }
 
