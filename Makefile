@@ -6,14 +6,18 @@ BUILD_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
+GOPATH ?= $(shell pwd)/_workspace
+GOBASE := $(firstword $(subst :, ,$(GOPATH)))
+GOBIN := $(GOBASE)/bin
 GO ?= go
 GOFMT ?= gofmt
-GOLINT ?= golangci-lint
+GOLINT := $(GOBIN)/golangci-lint
 
 export CGO_ENABLED = 0
 export GO111MODULE = on
 export GOARCH
 export GOOS
+export GOBIN
 
 GO_MODULE := $(shell $(GO) list -m)
 GO_PACKAGES := $(shell $(GO) list ./... | grep -vE '/(tools|test|vendor)')
@@ -45,7 +49,7 @@ clean:
 	@$(GO) clean -x
 
 .PHONY: lint
-lint: $(GO_SOURCES)
+lint: $(GOLINT) $(GO_SOURCES)
 	$(GOLINT) run ./...
 
 .PHONY: format
@@ -58,6 +62,12 @@ test: $(GO_SOURCES)
 
 .PHONY: build
 build: $(addprefix out/,$(PROGRAMS))
+
+$(GOBIN)/%:
+	# go install -v -tags tools ./...
+	- grep '_ "' tools/tools.go | \
+		awk '{ print $$2 }' | \
+		xargs -n1 $(GO) install -v
 
 out/%: $(GO_SOURCES)
 	$(GO) build \
