@@ -65,11 +65,11 @@ func TestParseVariants(t *testing.T) {
 			Port: 22,
 		},
 		remote.Host{
-			Host: "::1%2",
+			Host: "::1",
 			Port: 22,
 		},
 		remote.Host{
-			Host: "fe80::200:5eff:fe00:5342%3",
+			Host: "fe80::200:5eff:fe00:5342",
 		},
 	}
 
@@ -111,6 +111,49 @@ func TestParseDuplicates(t *testing.T) {
 	testParse(t, unit, want)
 }
 
+func TestParsePuppet(t *testing.T) {
+	unit := newUnit("puppet")
+	want := []remote.Host{
+		remote.Host{
+			Host: "bastion-ed25519",
+		},
+		remote.Host{
+			Host: "bastion-ed25519.example.com",
+		},
+		remote.Host{
+			Host: "127.193.74.241",
+		},
+		remote.Host{
+			Host: "bastion-ecdsa",
+		},
+		remote.Host{
+			Host: "bastion-ecdsa.example.com",
+		},
+		remote.Host{
+			Host: "127.193.74.242",
+		},
+		remote.Host{
+			Host: "bastion-rsa",
+		},
+		remote.Host{
+			Host: "bastion-rsa.example.com",
+		},
+		remote.Host{
+			Host: "127.193.74.243",
+		},
+		remote.Host{
+			Host: "bastion-dsa",
+		},
+		remote.Host{
+			Host: "bastion-dsa.example.com",
+		},
+		remote.Host{
+			Host: "127.193.74.244",
+		},
+	}
+
+	testParse(t, unit, want)
+}
 
 func testParse(t *testing.T, unit *KnownHostsProvider, want []remote.Host) {
 	got, err := unit.Parse()

@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"bytes"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -18,6 +19,7 @@ import (
 var (
 	hashed_indicator  = []byte("|")
 	comment_indicator = []byte("#")
+	host_sanitizer    = regexp.MustCompile(`(>%[0-9]+|_[a-z0-9]+)$`)
 )
 
 type KnownHostsProvider struct {
@@ -113,18 +115,17 @@ func (p *KnownHostsProvider) parseHost(host string) (remote.Host, error) {
 	}
 
 	if host == "" {
-	 return parsed, errors.New("host must not be empty")
-	} else {
-		host = strings.Replace(host, "<", "", 1)
-		host = strings.Replace(host, ">", "", 1)
+		return parsed, errors.New("host must not be empty")
+	} else if host, err = p.sanitizeHost(host); err != nil {
+		return parsed, err
 	}
 
 	if colonPort != "" {
-	 if 2 > len(colonPort) {
-		 return parsed, errors.New("port must not be empty")
-	 } else if port, err = strconv.Atoi(colonPort[1:]); err != nil {
-		 return parsed, err
-	 }
+		if 2 > len(colonPort) {
+			return parsed, errors.New("port must not be empty")
+		} else if port, err = strconv.Atoi(colonPort[1:]); err != nil {
+			return parsed, err
+		}
 	}
 
 	parsed = remote.Host{
@@ -135,6 +136,12 @@ func (p *KnownHostsProvider) parseHost(host string) (remote.Host, error) {
 	return parsed, nil
 }
 
+func (p *KnownHostsProvider) sanitizeHost(host string) (string, error) {
+	host = strings.TrimPrefix(host, "<")
+	host = host_sanitizer.ReplaceAllLiteralString(host, "")
+
+	return host, nil
+}
 
 func NewKnownHostsProvider(file string, ignoreMalformed bool) *KnownHostsProvider {
 	provider := &KnownHostsProvider{
