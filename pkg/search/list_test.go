@@ -86,5 +86,20 @@ func TestLen(t *testing.T) {
   assert.Equal(t, unit.Len(), 2)
 
   unit.Add(newElement(1))
+  assert.Equal(t, unit.Len(), 2)
+
+  unit.Add(newElement(3))
   assert.Equal(t, unit.Len(), 3)
+
+  unit.Add(newElement(2))
+  assert.Equal(t, unit.Len(), 3)
+
+  unit.Add(newElement(5))
+  assert.Equal(t, unit.Len(), 4)
+
+  unit.Add(newElement(4))
+  assert.Equal(t, unit.Len(), 5)
+
+  unit.Add(newElement(3))
+  assert.Equal(t, unit.Len(), 5)
 }

@@ -9,18 +9,30 @@ import (
 type ListFilter func(s, substr string) bool
 
 type List struct {
-	length    int
 	filter    ListFilter
 	container *list.List
 }
 
 func (l *List) Len() int {
-	return l.length
+	return l.container.Len()
 }
 
 func (l *List) Add(element fmt.Stringer) {
+	needle := element.String()
+
+	for e := l.container.Front(); e != nil; e = e.Next() {
+		v := e.Value.(fmt.Stringer)
+		c := strings.Compare(v.String(), needle)
+
+		if c == 0 {
+			return
+		} else if c > 0 {
+			l.container.InsertAfter(element, e)
+			return
+		}
+	}
+
 	l.container.PushBack(element)
-	l.length++
 }
 
 func (l *List) Select(query string) []fmt.Stringer {
@@ -55,7 +67,6 @@ func NewList(filter ListFilter) *List {
 	}
 
 	list := &List{
-		length:    0,
 		filter:    filter,
 		container: list.New(),
 	}
