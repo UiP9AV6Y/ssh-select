@@ -12,6 +12,7 @@ GOBIN := $(GOBASE)/bin
 GO ?= go
 GOFMT ?= gofmt
 GOLINT := $(GOBIN)/golangci-lint
+TAR ?= tar
 
 export CGO_ENABLED = 0
 export GO111MODULE = on
@@ -45,6 +46,7 @@ all: lint test build
 
 .PHONY: clean
 clean:
+	-$(RM) *.gz
 	-$(RM) -r ./out
 	@$(GO) clean -x
 
@@ -63,6 +65,9 @@ test: $(GO_SOURCES)
 .PHONY: build
 build: $(addprefix out/,$(PROGRAMS))
 
+.PHONY: dist
+dist: $(notdir $(GO_MODULE))-$(VERSION)-$(GOARCH).tar.gz
+
 $(GOBIN)/%:
 	# go install -v -tags tools ./...
 	- grep '_ "' tools/tools.go | \
@@ -74,3 +79,8 @@ out/%: $(GO_SOURCES)
 		-o $@ \
 		-ldflags $(GO_LDFLAGS) \
 		$(GO_MODULE)/cmd/$(notdir $(basename $@))
+
+%.tar.gz: build
+	$(TAR) -cvzf $@ \
+		-C out \
+		$(notdir $(wildcard ./out/*))

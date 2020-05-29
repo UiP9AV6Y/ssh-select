@@ -5,6 +5,10 @@
 *.dylib
 *.test
 *.out
+*.zip
+*.tar
+*.gz
+*.xz
 /out/
 /vendor/
 /_workspace/
