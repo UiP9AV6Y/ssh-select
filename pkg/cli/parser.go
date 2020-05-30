@@ -23,6 +23,7 @@ const (
 	optArgSshBinary
 	optArgKnownHostsFile
 )
+const envVarPrefix = "SSH_SELECT_"
 
 var optArgNames = []string{
 	"",
@@ -91,9 +92,36 @@ func (p *Parser) parseOptArg(optArg optArg, value string) (bool, error) {
 	return false, nil
 }
 
-func (p *Parser) ParseEnv(env []string) error {
-	// TODO: parse variables for local arguments
-	p.Environment = env
+func (p *Parser) ParseEnv(env []string) (err error) {
+	for _, pair := range env {
+		trimmed := strings.TrimPrefix(pair, envVarPrefix)
+
+		if trimmed == pair {
+			p.Environment = append(p.Environment, pair)
+		} else {
+			kv := strings.SplitN(trimmed, "=", 2)
+			err = p.parseEnvArg(kv[0], kv[1])
+		}
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (p *Parser) parseEnvArg(key, value string) (err error) {
+	if len(value) == 0 {
+		return fmt.Errorf("env variable %s%s must not be empty", envVarPrefix, key)
+	}
+
+	switch {
+	case key == "SSH_BINARY":
+		p.SshBinary = value
+	case strings.HasPrefix(key, "KNOWN_HOSTS_FILE_"):
+		p.KnownHostsFiles = append(p.KnownHostsFiles, value)
+	}
 
 	return nil
 }

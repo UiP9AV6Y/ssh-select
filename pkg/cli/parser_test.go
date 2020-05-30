@@ -94,3 +94,26 @@ func TestParseArgvAll(t *testing.T) {
 	assert.Subset(t, unit.KnownHostsFiles, []string{"/tmp/known_hosts"}, "custom known hosts file")
 	assert.Equal(t, 5, len(unit.SshArgv), "SSH passthough arguments")
 }
+
+func TestParseEnvMissingValue(t *testing.T) {
+	unit := NewParser("test")
+	input := []string{
+		"SSH_SELECT_SSH_BINARY=",
+	}
+	err := unit.ParseEnv(input)
+
+	assert.EqualError(t, err, "env variable SSH_SELECT_SSH_BINARY must not be empty")
+}
+
+func TestParseEnv(t *testing.T) {
+	unit := NewParser("test")
+	input := []string{
+		"SSH_SELECT_SSH_BINARY=/opt/bin/ssh",
+		"SSH_SELECT_KNOWN_HOSTS_FILE_test=/tmp/known_hosts",
+	}
+	err := unit.ParseEnv(input)
+
+	assert.Nil(t, err, "parsing without errors")
+	assert.Equal(t, "/opt/bin/ssh", unit.SshBinary, "custom SSH path")
+	assert.Subset(t, unit.KnownHostsFiles, []string{"/tmp/known_hosts"}, "custom known hosts file")
+}
