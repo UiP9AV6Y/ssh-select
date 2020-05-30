@@ -48,8 +48,10 @@ GO_LDFLAGS += '
 
 ifeq ($(GOOS),windows)
 	PROGRAMS := $(addsuffix .exe,$(GO_CMDS))
+	BINARY_DIST_EXT := zip
 else
 	PROGRAMS := $(GO_CMDS)
+	BINARY_DIST_EXT := tar.gz
 endif
 
 .PHONY: default
@@ -80,7 +82,7 @@ test: $(GO_SOURCES)
 build: $(addprefix $(BUILD_DIR)/,$(PROGRAMS))
 
 .PHONY: binary-dist
-binary-dist: $(PROJECT_NAME)-$(VERSION)-$(GOARCH).tar.gz
+binary-dist: $(PROJECT_NAME)_$(VERSION)-$(GOOS)-$(GOARCH).$(BINARY_DIST_EXT)
 
 .PHONY: dist
 dist: tar
@@ -115,7 +117,12 @@ $(BUILD_DIR)/%: $(GO_SOURCES)
 %.zip: build
 	$(ZIP) -jr $@ $(BUILD_DIR)
 
-%.tar.gz: build
+%.tar.gz %.tgz: build
 	$(TAR) -czf $@ \
+		-C $(BUILD_DIR) \
+		$(notdir $(wildcard $(BUILD_DIR)/*))
+
+%.tar.xz %.txz: build
+	$(TAR) -cJf $@ \
 		-C $(BUILD_DIR) \
 		$(notdir $(wildcard $(BUILD_DIR)/*))
