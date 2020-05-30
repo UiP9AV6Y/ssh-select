@@ -15,8 +15,8 @@ import (
 	"github.com/UiP9AV6Y/ssh-select/pkg/version"
 )
 
-func printHelp(_ *cli.Parser) {
-	fmt.Printf("Usage: %s [SSH_ARG...]\n", os.Args[0])
+func printHelp(cli *cli.Parser) {
+	fmt.Printf("Usage: %s [SSH_ARG...]\n", cli.Application)
 }
 
 func newProviders(cli *cli.Parser) []provider.HostProvider {
@@ -34,7 +34,7 @@ func newProviders(cli *cli.Parser) []provider.HostProvider {
 		providers = append(providers, provider)
 	}
 
-	for _, file := range cli.KnownHostFiles() {
+	for _, file := range cli.KnownHostsFiles {
 		provider := provider.NewKnownHostsProvider(file, true)
 		providers = append(providers, provider)
 	}
@@ -43,7 +43,7 @@ func newProviders(cli *cli.Parser) []provider.HostProvider {
 }
 
 func newParser() *cli.Parser {
-	parser := cli.NewParser()
+	parser := cli.NewParser(os.Args[0])
 
 	if err := parser.ParseArgv(os.Args[1:]); err != nil {
 		fmt.Println("Invalid argument:", err)
@@ -94,16 +94,16 @@ func main() {
 
 	parser = newParser()
 
-	if parser.Version() {
+	if parser.Version {
 		fmt.Println(version.Version(), version.Commit())
 		os.Exit(0)
-	} else if parser.Help() {
+	} else if parser.Help {
 		printHelp(parser)
 		os.Exit(0)
 	}
 
-	cmd = parser.SshBinary()
-	if cmd == "" {
+	cmd = parser.SshBinary
+	if len(cmd) == 0 {
 		if cmd, err = exec.LookPath("ssh"); err != nil {
 			fmt.Println("Unable to locale ssh binary:", err)
 			os.Exit(1)
@@ -118,7 +118,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	client = remote.NewSshClient(cmd, parser.SshArgv(), parser.Environment())
+	client = remote.NewSshClient(cmd, parser.SshArgv, parser.Environment)
 	complete = completer.NewCompleter(lookup)
 	executor = client.NewExecutor(lookup, false)
 	suggestions = complete.NewSuggestions()
