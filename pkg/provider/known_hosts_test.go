@@ -10,22 +10,22 @@ import (
 func TestParseBasic(t *testing.T) {
 	unit := newUnit("basic")
 	want := []remote.Host{
-		remote.Host {
+		{
 			Host: "ldn01.example.net",
 		},
-		remote.Host {
+		{
 			Host: "127.162.222.67",
 		},
-		remote.Host {
+		{
 			Host: "nyc01.example.org",
 		},
-		remote.Host {
+		{
 			Host: "127.230.83.95",
 		},
-		remote.Host {
+		{
 			Host: "syd01.example.com",
 		},
-		remote.Host {
+		{
 			Host: "127.124.68.128",
 		},
 	}
@@ -36,39 +36,39 @@ func TestParseBasic(t *testing.T) {
 func TestParseVariants(t *testing.T) {
 	unit := newUnit("variants")
 	want := []remote.Host{
-		remote.Host{
+		{
 			Host: "regular.hostname",
 		},
-		remote.Host{
+		{
 			Host: "127.0.0.1",
 		},
-		remote.Host{
+		{
 			Host: "127.0.0.2",
 		},
-		remote.Host{
+		{
 			Host: "only.hostname",
 		},
-		remote.Host{
+		{
 			Host: "port.hostname",
 			Port: 22,
 		},
-		remote.Host{
+		{
 			Host: "127.0.0.3",
 			Port: 22,
 		},
-		remote.Host{
+		{
 			Host: "127.0.0.4",
 			Port: 22,
 		},
-		remote.Host{
+		{
 			Host: "only.port.hostname",
 			Port: 22,
 		},
-		remote.Host{
+		{
 			Host: "::1",
 			Port: 22,
 		},
-		remote.Host{
+		{
 			Host: "fe80::200:5eff:fe00:5342",
 		},
 	}
@@ -79,31 +79,31 @@ func TestParseVariants(t *testing.T) {
 func TestParseDuplicates(t *testing.T) {
 	unit := newUnit("duplicates")
 	want := []remote.Host{
-		remote.Host{
+		{
 			Host: "node01",
 		},
-		remote.Host{
+		{
 			Host: "node01.example.org",
 		},
-		remote.Host{
+		{
 			Host: "node01",
 		},
-		remote.Host{
+		{
 			Host: "node01.example.com",
 		},
-		remote.Host{
+		{
 			Host: "node02",
 		},
-		remote.Host{
+		{
 			Host: "node02",
 		},
-		remote.Host{
+		{
 			Host: "node02",
 		},
-		remote.Host{
+		{
 			Host: "node03",
 		},
-		remote.Host{
+		{
 			Host: "node03.example.com",
 		},
 	}
@@ -114,40 +114,40 @@ func TestParseDuplicates(t *testing.T) {
 func TestParsePuppet(t *testing.T) {
 	unit := newUnit("puppet")
 	want := []remote.Host{
-		remote.Host{
+		{
 			Host: "bastion-ed25519",
 		},
-		remote.Host{
+		{
 			Host: "bastion-ed25519.example.com",
 		},
-		remote.Host{
+		{
 			Host: "127.193.74.241",
 		},
-		remote.Host{
+		{
 			Host: "bastion-ecdsa",
 		},
-		remote.Host{
+		{
 			Host: "bastion-ecdsa.example.com",
 		},
-		remote.Host{
+		{
 			Host: "127.193.74.242",
 		},
-		remote.Host{
+		{
 			Host: "bastion-rsa",
 		},
-		remote.Host{
+		{
 			Host: "bastion-rsa.example.com",
 		},
-		remote.Host{
+		{
 			Host: "127.193.74.243",
 		},
-		remote.Host{
+		{
 			Host: "bastion-dsa",
 		},
-		remote.Host{
+		{
 			Host: "bastion-dsa.example.com",
 		},
-		remote.Host{
+		{
 			Host: "127.193.74.244",
 		},
 	}
@@ -172,7 +172,7 @@ func testParse(t *testing.T, unit *KnownHostsProvider, want []remote.Host) {
 }
 
 func newUnit(fixture string) *KnownHostsProvider {
-	fixture = filepath.Join("testdata", fixture + ".known_hosts")
+	fixture = filepath.Join("testdata", fixture+".known_hosts")
 
 	return NewKnownHostsProvider(fixture, true)
 }

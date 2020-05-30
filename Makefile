@@ -56,7 +56,7 @@ lint: $(GOLINT) $(GO_SOURCES)
 
 .PHONY: format
 format: $(GO_SOURCES)
-	@$(GOFMT) -s -w $<
+	@$(GOFMT) -s -w $^
 
 .PHONY: test
 test: $(GO_SOURCES)

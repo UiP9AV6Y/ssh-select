@@ -1,10 +1,10 @@
 package provider
 
 import (
-	"errors"
-	"fmt"
 	"bufio"
 	"bytes"
+	"errors"
+	"fmt"
 	"os"
 	"regexp"
 	"strconv"
@@ -24,7 +24,7 @@ var (
 
 type KnownHostsProvider struct {
 	ignoreMalformed bool
-	file string
+	file            string
 }
 
 func (p *KnownHostsProvider) String() string {
@@ -46,7 +46,7 @@ func (p *KnownHostsProvider) Parse() ([]remote.Host, error) {
 
 func (p *KnownHostsProvider) parseFile(file *os.File) ([]remote.Host, error) {
 	scanner := bufio.NewScanner(file)
-	result := []remote.Host {}
+	result := []remote.Host{}
 	lineNo := 0
 
 	for scanner.Scan() {
@@ -146,7 +146,7 @@ func (p *KnownHostsProvider) sanitizeHost(host string) (string, error) {
 func NewKnownHostsProvider(file string, ignoreMalformed bool) *KnownHostsProvider {
 	provider := &KnownHostsProvider{
 		ignoreMalformed: ignoreMalformed,
-		file: file,
+		file:            file,
 	}
 
 	return provider
@@ -158,7 +158,7 @@ func UserKnownHostsProvider(ignoreMalformed bool) *KnownHostsProvider {
 	if file, err := util.UserFilePath(false, ".ssh", "known_hosts"); err == nil {
 		provider = &KnownHostsProvider{
 			ignoreMalformed: ignoreMalformed,
-			file: file,
+			file:            file,
 		}
 	}
 
@@ -171,7 +171,7 @@ func ConfigKnownHostsProvider(ignoreMalformed bool) *KnownHostsProvider {
 	if file, err := util.UserFilePath(true, "ssh", "known_hosts"); err == nil {
 		provider = &KnownHostsProvider{
 			ignoreMalformed: ignoreMalformed,
-			file: file,
+			file:            file,
 		}
 
 	}
@@ -185,7 +185,7 @@ func SystemKnownHostsProvider(ignoreMalformed bool) *KnownHostsProvider {
 	if file, err := util.ResolvePath("/", "etc", "ssh", "ssh_known_hosts"); err == nil {
 		provider = &KnownHostsProvider{
 			ignoreMalformed: ignoreMalformed,
-			file: file,
+			file:            file,
 		}
 	}
 

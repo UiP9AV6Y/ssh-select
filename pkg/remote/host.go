@@ -47,7 +47,7 @@ func ParseHost(text string) (*Host, error) {
 		return nil, err
 	}
 
-	host := &Host {
+	host := &Host{
 		User: user,
 		Host: addr,
 		Port: port,

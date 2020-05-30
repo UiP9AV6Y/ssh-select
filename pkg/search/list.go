@@ -1,8 +1,8 @@
 package search
 
 import (
-	"fmt"
 	"container/list"
+	"fmt"
 	"strings"
 )
 
