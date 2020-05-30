@@ -13,6 +13,17 @@ GO ?= go
 GOFMT ?= gofmt
 GOLINT := $(GOBIN)/golangci-lint
 TAR ?= tar
+ZIP ?= zip
+INSTALL ?= install
+INSTALL_PROGRAM = $(INSTALL)
+INSTALL_DATA = $(INSTALL) -m 644
+prefix ?= /usr/local
+datarootdir = $(prefix)/share
+datadir = $(datarootdir)
+exec_prefix = $(prefix)
+bindir = $(exec_prefix)/bin
+libexecdir = $(exec_prefix)/libexec
+infodir = $(datarootdir)/info
 
 export CGO_ENABLED = 0
 export GO111MODULE = on
@@ -24,6 +35,9 @@ GO_MODULE := $(shell $(GO) list -m)
 GO_PACKAGES := $(shell $(GO) list ./... | grep -vE '/(tools|test|vendor)')
 GO_SOURCES := $(shell find . -type f -name '*.go' | grep -vE '/(tools|test|vendor)/')
 GO_CMDS := $(notdir $(wildcard ./cmd/*))
+
+PROJECT_NAME ?= $(notdir $(GO_MODULE))
+BUILD_DIR ?= out
 
 GO_LDFLAGS := '-extldflags "-static"
 GO_LDFLAGS += -X $(GO_MODULE)/pkg/version.version=$(VERSION)
@@ -46,8 +60,8 @@ all: lint test build
 
 .PHONY: clean
 clean:
-	-$(RM) *.gz
-	-$(RM) -r ./out
+	-$(RM) *.gz *.xz *.tar *.zip
+	-$(RM) -r $(BUILD_DIR)
 	@$(GO) clean -x
 
 .PHONY: lint
@@ -63,10 +77,21 @@ test: $(GO_SOURCES)
 	@$(GO) test $(GO_PACKAGES)
 
 .PHONY: build
-build: $(addprefix out/,$(PROGRAMS))
+build: $(addprefix $(BUILD_DIR)/,$(PROGRAMS))
+
+.PHONY: binary-dist
+binary-dist: $(PROJECT_NAME)-$(VERSION)-$(GOARCH).tar.gz
 
 .PHONY: dist
-dist: $(notdir $(GO_MODULE))-$(VERSION)-$(GOARCH).tar.gz
+dist: tar
+
+.PHONY: tar
+tar: $(PROJECT_NAME)-$(VERSION).tar
+
+.PHONY: install
+install: build
+	$(INSTALL) -d $(DESTDIR)$(bindir)/
+	$(INSTALL_PROGRAM) $(wildcard $(BUILD_DIR)/*) $(DESTDIR)$(bindir)/
 
 $(GOBIN)/%:
 	# go install -v -tags tools ./...
@@ -74,13 +99,23 @@ $(GOBIN)/%:
 		awk '{ print $$2 }' | \
 		xargs -n1 $(GO) install -v
 
-out/%: $(GO_SOURCES)
+$(BUILD_DIR)/%: $(GO_SOURCES)
 	$(GO) build \
 		-o $@ \
 		-ldflags $(GO_LDFLAGS) \
 		$(GO_MODULE)/cmd/$(notdir $(basename $@))
 
+%.tar: $(GO_SOURCES)
+	$(TAR) -cf $@ \
+		--exclude-vcs \
+		--exclude-vcs-ignores \
+		--exclude .github \
+		$(shell git ls-files --exclude-standard)
+
+%.zip: build
+	$(ZIP) -jr $@ $(BUILD_DIR)
+
 %.tar.gz: build
-	$(TAR) -cvzf $@ \
-		-C out \
-		$(notdir $(wildcard ./out/*))
+	$(TAR) -czf $@ \
+		-C $(BUILD_DIR) \
+		$(notdir $(wildcard $(BUILD_DIR)/*))
