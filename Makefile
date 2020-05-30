@@ -1,7 +1,7 @@
 .DEFAULT_GOAL: default
 
-VERSION ?= 0.0.0
-COMMIT ?= HEAD
+VERSION ?= $(shell git describe --abbrev=0 --tags 2>/dev/null || echo 0.0.0)
+COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo HEAD)
 BUILD_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 GOOS ?= $(shell go env GOOS)
