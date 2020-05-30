@@ -27,7 +27,7 @@ func (l *List) Add(element fmt.Stringer) {
 		if c == 0 {
 			return
 		} else if c > 0 {
-			l.container.InsertAfter(element, e)
+			l.container.InsertBefore(element, e)
 			return
 		}
 	}

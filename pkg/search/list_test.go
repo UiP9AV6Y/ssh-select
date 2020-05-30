@@ -103,3 +103,65 @@ func TestLen(t *testing.T) {
 	unit.Add(newElement(3))
 	assert.Equal(t, unit.Len(), 5)
 }
+
+func TestAdd(t *testing.T) {
+	unit := NewList(nil)
+	assert.Equal(t, unit.Len(), 0)
+
+	unit.Add(element{
+		Value: "aaaa",
+	})
+	unit.Add(element{
+		Value: "bbbb",
+	})
+	unit.Add(element{
+		Value: "aaa",
+	})
+	unit.Add(element{
+		Value: "aa",
+	})
+	unit.Add(element{
+		Value: "a",
+	})
+	unit.Add(element{
+		Value: "aa",
+	})
+	unit.Add(element{
+		Value: "aaa",
+	})
+	unit.Add(element{
+		Value: "bbbb",
+	})
+	unit.Add(element{
+		Value: "bbb",
+	})
+	unit.Add(element{
+		Value: "bb",
+	})
+	unit.Add(element{
+		Value: "b",
+	})
+	unit.Add(element{
+		Value: "aa",
+	})
+	unit.Add(element{
+		Value: "aaa",
+	})
+	unit.Add(element{
+		Value: "aaaa",
+	})
+	unit.Add(element{
+		Value: "cccc",
+	})
+	unit.Add(element{
+		Value: "dddd",
+	})
+	unit.Add(element{
+		Value: "ffff",
+	})
+	unit.Add(element{
+		Value: "bbbb",
+	})
+
+	assert.Equal(t, unit.Len(), 11)
+}
