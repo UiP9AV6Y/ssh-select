@@ -42,7 +42,7 @@ func TestSelect(t *testing.T) {
 		elements[12],
 		elements[20],
 	}
-	assert.ElementsMatch(t, unit.Select("2"), want, "searching for '2'")
+	assert.ElementsMatch(t, want, unit.Select("2"), "searching for '2'")
 
 	assert.Empty(t, unit.Select("xxx"), "searching for 'xxx'")
 }
@@ -55,7 +55,7 @@ func TestSelectCustom(t *testing.T) {
 		elements[10],
 		elements[20],
 	}
-	assert.ElementsMatch(t, unit.Select("0"), want, "searching for '0'")
+	assert.ElementsMatch(t, want, unit.Select("0"), "searching for '0'")
 
 	assert.Empty(t, unit.Select("xxx"), "searching for 'xxx'")
 }
@@ -68,7 +68,7 @@ func TestGet(t *testing.T) {
 		got, ok := unit.Get(want.String())
 
 		assert.Truef(t, ok, "expected to find %v", want)
-		assert.Equal(t, got, want)
+		assert.Equal(t, want, got)
 	}
 
 	got, ok := unit.Get("xxx")
@@ -77,36 +77,36 @@ func TestGet(t *testing.T) {
 
 func TestLen(t *testing.T) {
 	unit := NewList(nil)
-	assert.Equal(t, unit.Len(), 0)
+	assert.Equal(t, 0, unit.Len())
 
 	unit.Add(newElement(1))
-	assert.Equal(t, unit.Len(), 1)
+	assert.Equal(t, 1, unit.Len())
 
 	unit.Add(newElement(2))
-	assert.Equal(t, unit.Len(), 2)
+	assert.Equal(t, 2, unit.Len())
 
 	unit.Add(newElement(1))
-	assert.Equal(t, unit.Len(), 2)
+	assert.Equal(t, 2, unit.Len())
 
 	unit.Add(newElement(3))
-	assert.Equal(t, unit.Len(), 3)
+	assert.Equal(t, 3, unit.Len())
 
 	unit.Add(newElement(2))
-	assert.Equal(t, unit.Len(), 3)
+	assert.Equal(t, 3, unit.Len())
 
 	unit.Add(newElement(5))
-	assert.Equal(t, unit.Len(), 4)
+	assert.Equal(t, 4, unit.Len())
 
 	unit.Add(newElement(4))
-	assert.Equal(t, unit.Len(), 5)
+	assert.Equal(t, 5, unit.Len())
 
 	unit.Add(newElement(3))
-	assert.Equal(t, unit.Len(), 5)
+	assert.Equal(t, 5, unit.Len())
 }
 
 func TestAdd(t *testing.T) {
 	unit := NewList(nil)
-	assert.Equal(t, unit.Len(), 0)
+	assert.Equal(t, 0, unit.Len())
 
 	unit.Add(element{
 		Value: "aaaa",
@@ -163,5 +163,5 @@ func TestAdd(t *testing.T) {
 		Value: "bbbb",
 	})
 
-	assert.Equal(t, unit.Len(), 11)
+	assert.Equal(t, 11, unit.Len())
 }
