@@ -49,13 +49,13 @@ func newProviders(cli *cli.Parser) []provider.HostProvider {
 func newParser() *cli.Parser {
 	parser := cli.NewParser(os.Args[0])
 
-	if err := parser.ParseArgv(os.Args[1:]); err != nil {
-		fmt.Println("Invalid argument:", err)
+	if err := parser.ParseEnv(os.Environ()); err != nil {
+		fmt.Println("Invalid environment variable:", err)
 		os.Exit(1)
 	}
 
-	if err := parser.ParseEnv(os.Environ()); err != nil {
-		fmt.Println("Invalid environment variable:", err)
+	if err := parser.ParseArgv(os.Args[1:]); err != nil {
+		fmt.Println("Invalid argument:", err)
 		os.Exit(1)
 	}
 
