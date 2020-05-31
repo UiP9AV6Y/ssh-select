@@ -108,12 +108,14 @@ func TestParseEnvMissingValue(t *testing.T) {
 func TestParseEnv(t *testing.T) {
 	unit := NewParser("test")
 	input := []string{
+		"SSH_SELECT_NO_SEARCH_KNOWN_HOSTS=yes",
 		"SSH_SELECT_SSH_BINARY=/opt/bin/ssh",
 		"SSH_SELECT_KNOWN_HOSTS_FILE_test=/tmp/known_hosts",
 	}
 	err := unit.ParseEnv(input)
 
 	assert.Nil(t, err, "parsing without errors")
+	assert.True(t, unit.NoSearchKnownHosts, "known_hosts search is disabled")
 	assert.Equal(t, "/opt/bin/ssh", unit.SshBinary, "custom SSH path")
 	assert.Subset(t, unit.KnownHostsFiles, []string{"/tmp/known_hosts"}, "custom known hosts file")
 }

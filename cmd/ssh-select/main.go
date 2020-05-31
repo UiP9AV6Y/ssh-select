@@ -22,6 +22,15 @@ func printHelp(cli *cli.Parser) {
 func newProviders(cli *cli.Parser) []provider.HostProvider {
 	providers := []provider.HostProvider{}
 
+	for _, file := range cli.KnownHostsFiles {
+		provider := provider.NewKnownHostsProvider(file, true)
+		providers = append(providers, provider)
+	}
+
+	if cli.NoSearchKnownHosts {
+		return providers
+	}
+
 	if provider := provider.UserKnownHostsProvider(true); provider != nil {
 		providers = append(providers, provider)
 	}
@@ -31,11 +40,6 @@ func newProviders(cli *cli.Parser) []provider.HostProvider {
 	}
 
 	if provider := provider.SystemKnownHostsProvider(true); provider != nil {
-		providers = append(providers, provider)
-	}
-
-	for _, file := range cli.KnownHostsFiles {
-		provider := provider.NewKnownHostsProvider(file, true)
 		providers = append(providers, provider)
 	}
 

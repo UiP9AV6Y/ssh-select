@@ -7,13 +7,14 @@ import (
 )
 
 type Parser struct {
-	Version         bool
-	Help            bool
-	SshBinary       string
-	Application     string
-	KnownHostsFiles []string
-	SshArgv         []string
-	Environment     []string
+	Version            bool
+	Help               bool
+	NoSearchKnownHosts bool
+	SshBinary          string
+	Application        string
+	KnownHostsFiles    []string
+	SshArgv            []string
+	Environment        []string
 }
 
 type optArg int
@@ -64,6 +65,8 @@ func (p *Parser) parseOpt(value string) (optArg, error) {
 		p.Version = true
 	case "--help":
 		p.Help = true
+	case "--no-search-known-hosts":
+		p.NoSearchKnownHosts = true
 	case "--ssh":
 		return optArgSshBinary, nil
 	case "--known-hosts":
@@ -117,6 +120,8 @@ func (p *Parser) parseEnvArg(key, value string) (err error) {
 	}
 
 	switch {
+	case key == "NO_SEARCH_KNOWN_HOSTS":
+		p.NoSearchKnownHosts = true
 	case key == "SSH_BINARY":
 		p.SshBinary = value
 	case strings.HasPrefix(key, "KNOWN_HOSTS_FILE_"):
@@ -128,9 +133,6 @@ func (p *Parser) parseEnvArg(key, value string) (err error) {
 
 func NewParser(application string) *Parser {
 	parser := &Parser{
-		Version:         false,
-		Help:            false,
-		SshBinary:       "",
 		Application:     filepath.Base(application),
 		KnownHostsFiles: []string{},
 		SshArgv:         []string{},
