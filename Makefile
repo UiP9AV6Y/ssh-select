@@ -12,6 +12,7 @@ GOBIN := $(GOBASE)/bin
 GO ?= go
 GOFMT ?= gofmt
 GOLINT := $(GOBIN)/golangci-lint
+CSUM ?= sha256sum
 TAR ?= tar
 ZIP ?= zip
 INSTALL ?= install
@@ -62,7 +63,7 @@ all: lint test build
 
 .PHONY: clean
 clean:
-	-$(RM) *.gz *.xz *.tar *.zip
+	-$(RM) *.gz *.xz *.tar *.zip *.sha256
 	-$(RM) -r $(BUILD_DIR)
 	@$(GO) clean -x
 
@@ -126,3 +127,6 @@ $(BUILD_DIR)/%: $(GO_SOURCES)
 	$(TAR) -cJf $@ \
 		-C $(BUILD_DIR) \
 		$(notdir $(wildcard $(BUILD_DIR)/*))
+
+%.sha256: %
+	$(CSUM) $< > $@

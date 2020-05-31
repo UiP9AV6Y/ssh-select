@@ -9,6 +9,7 @@
 *.tar
 *.gz
 *.xz
+*.sha256
 /out/
 /vendor/
 /_workspace/
