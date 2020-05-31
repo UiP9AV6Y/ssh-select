@@ -30,11 +30,11 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: release-${{ github.ref }}
-          path: *.tgz
+          path: '*.tgz'
       - uses: actions/upload-artifact@v2
         with:
           name: release-${{ github.ref }}
-          path: *.sha256
+          path: '*.sha256'
   release:
     name: Release ${{ github.ref }}
     runs-on: ubuntu-latest
