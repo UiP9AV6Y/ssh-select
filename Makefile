@@ -101,6 +101,10 @@ install: build
 	$(INSTALL) -d $(DESTDIR)$(bindir)/
 	$(INSTALL_PROGRAM) $(wildcard $(BUILD_DIR)/*) $(DESTDIR)$(bindir)/
 
+.PHONY: release-tag
+release-tag:
+	git tag -a -m "Release of $(VERSION)" $(VERSION)
+
 $(GOBIN)/%:
 	# go install -v -tags tools ./...
 	- grep '_ "' tools/tools.go | \
