@@ -38,6 +38,8 @@ GO_SOURCES := $(shell find . -type f -name '*.go' | grep -vE '/(tools|test|vendo
 GO_CMDS := $(notdir $(wildcard ./cmd/*))
 
 PROJECT_NAME ?= $(notdir $(GO_MODULE))
+DIST_NAME := $(PROJECT_NAME)_$(VERSION)
+BINARY_DIST_NAME := $(DIST_NAME)-$(GOOS)-$(GOARCH)
 BUILD_DIR ?= out
 
 GO_LDFLAGS := '-extldflags "-static"
@@ -63,7 +65,7 @@ all: lint test build
 
 .PHONY: clean
 clean:
-	-$(RM) *.gz *.xz *.tar *.zip *.sha256
+	-$(RM) *.gz *.xz *.tar *.zip *.tgz *.txz *.sha256
 	-$(RM) -r $(BUILD_DIR)
 	@$(GO) clean -x
 
@@ -82,14 +84,17 @@ test: $(GO_SOURCES)
 .PHONY: build
 build: $(addprefix $(BUILD_DIR)/,$(PROGRAMS))
 
+.PHONY: release-assets
+release-assets: $(BINARY_DIST_NAME).tgz $(BINARY_DIST_NAME).tgz.sha256
+
 .PHONY: binary-dist
-binary-dist: $(PROJECT_NAME)_$(VERSION)-$(GOOS)-$(GOARCH).$(BINARY_DIST_EXT)
+binary-dist: $(BINARY_DIST_NAME).$(BINARY_DIST_EXT)
 
 .PHONY: dist
 dist: tar
 
 .PHONY: tar
-tar: $(PROJECT_NAME)-$(VERSION).tar
+tar: $(DIST_NAME).tar
 
 .PHONY: install
 install: build

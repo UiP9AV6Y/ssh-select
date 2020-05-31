@@ -7,6 +7,8 @@
 *.out
 *.zip
 *.tar
+*.tgz
+*.txz
 *.gz
 *.xz
 *.sha256
