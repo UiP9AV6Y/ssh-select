@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Build ${{ matrix.platform }}/${{ matrix.arch }}
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-go@v2
