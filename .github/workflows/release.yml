@@ -40,16 +40,18 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: release-${{ github.sha }}
+      - uses: actions/checkout@v2
       - uses: heinrichreimer/github-changelog-generator-action@v2.1.1
         id: generate_changelog
         with:
           onlyLastTag: 'true'
           stripHeaders: 'true'
           stripGeneratorNotice: 'true'
+          output: CHANGELOG.md
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: softprops/action-gh-release@v1
         with:
-          body: ${{ steps.generate_changelog.outputs.changelog }}
+          body_path: CHANGELOG.md
           files: |
             *.tgz
             *.sha256
