@@ -7,8 +7,8 @@ import (
 	"github.com/UiP9AV6Y/ssh-select/pkg/remote"
 )
 
-func TestParseBasic(t *testing.T) {
-	unit := newUnit("basic")
+func TestParseBasicKnownHosts(t *testing.T) {
+	unit := newKnownHostsProviderUnit("basic")
 	want := []remote.Host{
 		{
 			Host: "ldn01.example.net",
@@ -33,8 +33,8 @@ func TestParseBasic(t *testing.T) {
 	testParse(t, unit, want)
 }
 
-func TestParseVariants(t *testing.T) {
-	unit := newUnit("variants")
+func TestParseVariantsKnownHosts(t *testing.T) {
+	unit := newKnownHostsProviderUnit("variants")
 	want := []remote.Host{
 		{
 			Host: "regular.hostname",
@@ -76,8 +76,8 @@ func TestParseVariants(t *testing.T) {
 	testParse(t, unit, want)
 }
 
-func TestParseDuplicates(t *testing.T) {
-	unit := newUnit("duplicates")
+func TestParseDuplicatesKnownHosts(t *testing.T) {
+	unit := newKnownHostsProviderUnit("duplicates")
 	want := []remote.Host{
 		{
 			Host: "node01",
@@ -111,8 +111,8 @@ func TestParseDuplicates(t *testing.T) {
 	testParse(t, unit, want)
 }
 
-func TestParsePuppet(t *testing.T) {
-	unit := newUnit("puppet")
+func TestParsePuppetKnownHosts(t *testing.T) {
+	unit := newKnownHostsProviderUnit("puppet")
 	want := []remote.Host{
 		{
 			Host: "bastion-ed25519",
@@ -155,38 +155,8 @@ func TestParsePuppet(t *testing.T) {
 	testParse(t, unit, want)
 }
 
-func testParse(t *testing.T, unit *KnownHostsProvider, want []remote.Host) {
-	got, err := unit.Parse()
-
-	if err != nil {
-		t.Fatalf("Parse: %v", err)
-	}
-
-	if len(got) != len(want) {
-		t.Fatalf("got %d elements; want %d elements", len(got), len(want))
-	}
-
-	for i, actual := range got {
-		compare(t, &want[i], &actual)
-	}
-}
-
-func newUnit(fixture string) *KnownHostsProvider {
+func newKnownHostsProviderUnit(fixture string) *KnownHostsProvider {
 	fixture = filepath.Join("testdata", fixture+".known_hosts")
 
 	return NewKnownHostsProvider(fixture, true)
-}
-
-func compare(t *testing.T, want, got *remote.Host) {
-	if want.User != got.User {
-		t.Errorf("got User=%q; want %q", got.User, want.User)
-	}
-
-	if want.Port != got.Port {
-		t.Errorf("got Port=%q; want %q", got.Port, want.Port)
-	}
-
-	if want.Host != got.Host {
-		t.Errorf("got Host=%q; want %q", got.Host, want.Host)
-	}
 }

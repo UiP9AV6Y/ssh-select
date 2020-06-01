@@ -12,6 +12,42 @@ has been selected, its process is replaced with that
 of an SSH client using the *exec* system call. There
 are no daemons or other lingering processes involved.
 
+## examples
+
+`ssh-select`
+
+without any arguments, known locations will be searched
+for host inputs. the resulting suggestions vary between
+execution environments.
+
+`ssh-select --no-search --known-hosts /tmp/ssh_known_hosts`
+
+populates the suggestion database with entries from the
+provided [known_hosts][] file. if the file does not
+exist, no autocompletion is possible as other sources
+have been disabled.
+
+`ssh-select --ssh /opt/bin/rsh`
+
+passes the collected arguments to the provided binary
+instead of the regular `ssh` binary.
+
+`ssh-select --no-search --hosts /etc/hosts`
+
+disables the automated import from well known host
+sources, but adds the */etc/hosts* file back into
+the selection.
+
+`ssh-select my.host.local`
+
+starts the wrapper with the input prompt already
+populated.
+
+`ssh-select -i /tmp/id_rsa user@remote.host.local`
+
+arguments not supported by `ssh-select` will be
+forwarded to `ssh` as-is.
+
 ## configuration
 
 SSH-select can change its behaviour base on
@@ -34,7 +70,11 @@ environment variables:
 
   path to a [known_hosts][] file. can be specified
   multiple times. duplicate hosts are filtered.
-* **--no-search-known-hosts**
+* **--hosts**
+
+  path to a [hosts file][]. can be specified
+  multiple times. duplicate hosts are filtered.
+* **--no-search**
 
   omit adding hosts from well-known file locations.
 
@@ -43,10 +83,10 @@ environment variables:
 environment variables related to the application
 are prefixed with *SSH_SELECT_*:
 
-* **SSH_SELECT_NO_SEARCH_KNOWN_HOSTS**
+* **SSH_SELECT_NO_SEARCH**
 
   if defined, has the same effect as
-  **--no-search-known-hosts**.
+  **--no-search**.
 * **SSH_SELECT_SSH_BINARY**
 
   same as **--ssh**
@@ -55,5 +95,11 @@ are prefixed with *SSH_SELECT_*:
   environment variables with this prefix have the
   same effect as **--known-hosts**; the suffix has
   no effect on the result.
+* **SSH_SELECT_HOSTS_FILE_$**
+
+  environment variables with this prefix have the
+  same effect as **--hosts**; the suffix has
+  no effect on the result.
 
 [known_hosts]: http://man.openbsd.org/sshd.8#SSH_KNOWN_HOSTS_FILE_FORMAT
+[hosts file]: http://www.tldp.org/LDP/solrhe/Securing-Optimizing-Linux-RH-Edition-v1.3/chap9sec95.html

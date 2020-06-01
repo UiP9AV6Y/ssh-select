@@ -27,9 +27,16 @@ func newProviders(cli *cli.Parser) []provider.HostProvider {
 		providers = append(providers, provider)
 	}
 
-	if cli.NoSearchKnownHosts {
-		return providers
+	for _, file := range cli.HostsFiles {
+		provider := provider.NewHostsFileProvider(file)
+		providers = append(providers, provider)
 	}
+
+	return providers
+}
+
+func newSystemProviders() []provider.HostProvider {
+	providers := []provider.HostProvider{}
 
 	if provider := provider.UserKnownHostsProvider(true); provider != nil {
 		providers = append(providers, provider)
@@ -40,6 +47,10 @@ func newProviders(cli *cli.Parser) []provider.HostProvider {
 	}
 
 	if provider := provider.SystemKnownHostsProvider(true); provider != nil {
+		providers = append(providers, provider)
+	}
+
+	if provider := provider.SystemHostsFileProvider(); provider != nil {
 		providers = append(providers, provider)
 	}
 
@@ -115,6 +126,10 @@ func main() {
 	}
 
 	providers = newProviders(parser)
+
+	if !parser.NoSearch {
+		providers = append(providers, newSystemProviders()...)
+	}
 
 	lookup, sources, err = newSearch(providers)
 	if err != nil {

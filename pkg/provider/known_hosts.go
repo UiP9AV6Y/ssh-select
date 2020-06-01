@@ -17,9 +17,9 @@ import (
 )
 
 var (
-	hashed_indicator  = []byte("|")
-	comment_indicator = []byte("#")
-	host_sanitizer    = regexp.MustCompile(`(>%[0-9]+|_[a-z0-9]+)$`)
+	knownHostHashedIndicator  = []byte("|")
+	knownHostCommentIndicator = []byte("#")
+	knownHostSanitizer        = regexp.MustCompile(`(>%[0-9]+|_[a-z0-9]+)$`)
 )
 
 type KnownHostsProvider struct {
@@ -54,8 +54,8 @@ func (p *KnownHostsProvider) parseFile(file *os.File) ([]remote.Host, error) {
 		lineNo++
 
 		if len(line) == 0 ||
-			bytes.HasPrefix(line, hashed_indicator) ||
-			bytes.HasPrefix(line, comment_indicator) {
+			bytes.HasPrefix(line, knownHostHashedIndicator) ||
+			bytes.HasPrefix(line, knownHostCommentIndicator) {
 			continue
 		}
 
@@ -138,7 +138,7 @@ func (p *KnownHostsProvider) parseHost(host string) (remote.Host, error) {
 
 func (p *KnownHostsProvider) sanitizeHost(host string) (string, error) {
 	host = strings.TrimPrefix(host, "<")
-	host = host_sanitizer.ReplaceAllLiteralString(host, "")
+	host = knownHostSanitizer.ReplaceAllLiteralString(host, "")
 
 	return host, nil
 }

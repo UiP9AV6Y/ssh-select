@@ -9,9 +9,10 @@ import (
 type Parser struct {
 	Version            bool
 	Help               bool
-	NoSearchKnownHosts bool
+	NoSearch           bool
 	SshBinary          string
 	Application        string
+	HostsFiles         []string
 	KnownHostsFiles    []string
 	SshArgv            []string
 	Environment        []string
@@ -23,6 +24,7 @@ const (
 	optArgNone optArg = iota
 	optArgSshBinary
 	optArgKnownHostsFile
+	optArgHostsFile
 )
 const envVarPrefix = "SSH_SELECT_"
 
@@ -30,6 +32,7 @@ var optArgNames = []string{
 	"",
 	"SSH binary",
 	"known hosts file",
+	"hosts file",
 }
 
 func (o optArg) String() string {
@@ -65,12 +68,14 @@ func (p *Parser) parseOpt(value string) (optArg, error) {
 		p.Version = true
 	case "--help":
 		p.Help = true
-	case "--no-search-known-hosts":
-		p.NoSearchKnownHosts = true
+	case "--no-search":
+		p.NoSearch = true
 	case "--ssh":
 		return optArgSshBinary, nil
 	case "--known-hosts":
 		return optArgKnownHostsFile, nil
+	case "--hosts":
+		return optArgHostsFile, nil
 	default:
 		p.SshArgv = append(p.SshArgv, value)
 	}
@@ -89,6 +94,9 @@ func (p *Parser) parseOptArg(optArg optArg, value string) (bool, error) {
 		return true, nil
 	case optArgKnownHostsFile:
 		p.KnownHostsFiles = append(p.KnownHostsFiles, value)
+		return true, nil
+	case optArgHostsFile:
+		p.HostsFiles = append(p.HostsFiles, value)
 		return true, nil
 	}
 
@@ -120,12 +128,14 @@ func (p *Parser) parseEnvArg(key, value string) (err error) {
 	}
 
 	switch {
-	case key == "NO_SEARCH_KNOWN_HOSTS":
-		p.NoSearchKnownHosts = true
+	case key == "NO_SEARCH":
+		p.NoSearch = true
 	case key == "SSH_BINARY":
 		p.SshBinary = value
 	case strings.HasPrefix(key, "KNOWN_HOSTS_FILE_"):
 		p.KnownHostsFiles = append(p.KnownHostsFiles, value)
+	case strings.HasPrefix(key, "HOSTS_FILE_"):
+		p.HostsFiles = append(p.HostsFiles, value)
 	}
 
 	return nil
@@ -133,10 +143,7 @@ func (p *Parser) parseEnvArg(key, value string) (err error) {
 
 func NewParser(application string) *Parser {
 	parser := &Parser{
-		Application:     filepath.Base(application),
-		KnownHostsFiles: []string{},
-		SshArgv:         []string{},
-		Environment:     []string{},
+		Application: filepath.Base(application),
 	}
 
 	return parser
