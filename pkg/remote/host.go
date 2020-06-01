@@ -29,6 +29,20 @@ func (h *Host) Suggest() prompt.Suggest {
 	}
 }
 
+func NewSimpleHost(addr string) Host {
+	return Host{
+		Host: addr,
+	}
+}
+
+func NewHost(user, addr string, port int) Host {
+	return Host{
+		User: user,
+		Host: addr,
+		Port: port,
+	}
+}
+
 func ParseHost(text string) (*Host, error) {
 	var user string
 	var addr string
