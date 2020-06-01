@@ -25,24 +25,22 @@ jobs:
         env:
           GOOS: ${{ matrix.platform }}
           GOARCH: ${{ matrix.arch }}
-          COMMIT: ${{ github.sha }}
-          VERSION: ${{ github.ref }}
       - uses: actions/upload-artifact@v2
         with:
-          name: release-${{ github.ref }}
+          name: release-${{ github.sha }}
           path: '*.tgz'
       - uses: actions/upload-artifact@v2
         with:
-          name: release-${{ github.ref }}
+          name: release-${{ github.sha }}
           path: '*.sha256'
   release:
-    name: Release ${{ github.ref }}
+    name: Release
     runs-on: ubuntu-latest
     needs: [build]
     steps:
       - uses: actions/download-artifact@v2
         with:
-          name: release-${{ github.ref }}
+          name: release-${{ github.sha }}
       - uses: heinrichreimer/github-changelog-generator-action@v2.1.1
         id: generate_changelog
         with:
