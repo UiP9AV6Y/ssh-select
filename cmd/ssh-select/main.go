@@ -148,10 +148,13 @@ func main() {
 		prompt.OptionPrefixTextColor(prompt.DefaultColor),
 	)
 
-	fmt.Printf("%s\n", version.Application("SSH Select"))
-	for source, count := range sources {
-		fmt.Printf("Received %d hosts from %s\n", count, source)
+	if !parser.Quiet {
+		fmt.Printf("%s\n", version.Application("SSH Select"))
+		for source, count := range sources {
+			fmt.Printf("Received %d hosts from %s\n", count, source)
+		}
+		fmt.Printf("Providing suggestions for %d hosts\n", complete.SuggestionCount())
 	}
-	fmt.Printf("Providing suggestions for %d hosts\n", complete.SuggestionCount())
+
 	choice.Run()
 }

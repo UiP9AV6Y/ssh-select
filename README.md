@@ -77,6 +77,9 @@ environment variables:
 * **--no-search**
 
   omit adding hosts from well-known file locations.
+* **--quiet**
+
+  omit the search summary upon start.
 
 ### environment variables
 
@@ -85,8 +88,10 @@ are prefixed with *SSH_SELECT_*:
 
 * **SSH_SELECT_NO_SEARCH**
 
-  if defined, has the same effect as
-  **--no-search**.
+  if defined, has the same effect as **--no-search**.
+* **SSH_SELECT_QUIET**
+
+  if defined, has the same effect as **--quiet**.
 * **SSH_SELECT_SSH_BINARY**
 
   same as **--ssh**
