@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+
+	"github.com/bmatcuk/doublestar"
 )
 
 type Parser struct {
@@ -101,14 +103,11 @@ func (p *Parser) parseOptArg(optArg optArg, value string) (bool, error) {
 		p.SshBinary = value
 		return true, nil
 	case optArgKnownHostsFile:
-		p.KnownHostsFiles = append(p.KnownHostsFiles, value)
-		return true, nil
+		return true, p.appendFileGlob(value, &p.KnownHostsFiles)
 	case optArgHostsFile:
-		p.HostsFiles = append(p.HostsFiles, value)
-		return true, nil
+		return true, p.appendFileGlob(value, &p.HostsFiles)
 	case optArgZoneFile:
-		p.ZoneFiles = append(p.ZoneFiles, value)
-		return true, nil
+		return true, p.appendFileGlob(value, &p.ZoneFiles)
 	}
 
 	return false, nil
@@ -146,11 +145,21 @@ func (p *Parser) parseEnvArg(key, value string) (err error) {
 	case key == "SSH_BINARY":
 		p.SshBinary = value
 	case strings.HasPrefix(key, "KNOWN_HOSTS_FILE_"):
-		p.KnownHostsFiles = append(p.KnownHostsFiles, value)
+		return p.appendFileGlob(value, &p.KnownHostsFiles)
 	case strings.HasPrefix(key, "HOSTS_FILE_"):
-		p.HostsFiles = append(p.HostsFiles, value)
+		return p.appendFileGlob(value, &p.HostsFiles)
 	case strings.HasPrefix(key, "ZONE_FILE_"):
-		p.ZoneFiles = append(p.ZoneFiles, value)
+		return p.appendFileGlob(value, &p.ZoneFiles)
+	}
+
+	return nil
+}
+
+func (p *Parser) appendFileGlob(value string, target *[]string) error {
+	if matches, err := doublestar.Glob(value); err != nil {
+		return err
+	} else if len(matches) > 0 {
+		*target = append(*target, matches...)
 	}
 
 	return nil

@@ -1,8 +1,9 @@
 package cli
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestApplication(t *testing.T) {
@@ -34,7 +35,7 @@ func TestParseArgvEmpty(t *testing.T) {
 func TestParseArgvSettings(t *testing.T) {
 	unit := NewParser("test")
 	input := []string{
-		"--known-hosts", "/tmp/known_hosts",
+		"--known-hosts", "testdata/test1.hosts",
 		"--ssh", "/usr/local/bin/rsh",
 		"--version",
 	}
@@ -43,7 +44,7 @@ func TestParseArgvSettings(t *testing.T) {
 	assert.Nil(t, err, "parsing without errors")
 	assert.True(t, unit.Version, "version switch triggered")
 	assert.Equal(t, "/usr/local/bin/rsh", unit.SshBinary, "custom SSH path")
-	assert.Subset(t, unit.KnownHostsFiles, []string{"/tmp/known_hosts"}, "custom known hosts file")
+	assert.Subset(t, unit.KnownHostsFiles, []string{"testdata/test1.hosts"}, "custom known hosts file")
 }
 
 func TestParseArgvSsh(t *testing.T) {
@@ -83,7 +84,7 @@ func TestParseArgvHostArgv(t *testing.T) {
 func TestParseArgvAll(t *testing.T) {
 	unit := NewParser("test")
 	input := []string{
-		"--known-hosts", "/tmp/known_hosts",
+		"--known-hosts", "testdata/test1.hosts",
 		"-i", "/tmp/id_rsa",
 		"remote.host.test",
 		"uname", "-a",
@@ -91,8 +92,19 @@ func TestParseArgvAll(t *testing.T) {
 	err := unit.ParseArgv(input)
 
 	assert.Nil(t, err, "parsing without errors")
-	assert.Subset(t, unit.KnownHostsFiles, []string{"/tmp/known_hosts"}, "custom known hosts file")
+	assert.Subset(t, unit.KnownHostsFiles, []string{"testdata/test1.hosts"}, "custom known hosts file")
 	assert.Equal(t, 5, len(unit.SshArgv), "SSH passthough arguments")
+}
+
+func TestParseArgvGlob(t *testing.T) {
+	unit := NewParser("test")
+	input := []string{
+		"--known-hosts", "testdata/*.hosts",
+	}
+	err := unit.ParseArgv(input)
+
+	assert.Nil(t, err, "parsing without errors")
+	assert.Subset(t, unit.KnownHostsFiles, []string{"testdata/test1.hosts", "testdata/test2.hosts"}, "custom known hosts file")
 }
 
 func TestParseEnvMissingValue(t *testing.T) {
@@ -110,12 +122,12 @@ func TestParseEnv(t *testing.T) {
 	input := []string{
 		"SSH_SELECT_NO_SEARCH=yes",
 		"SSH_SELECT_SSH_BINARY=/opt/bin/ssh",
-		"SSH_SELECT_KNOWN_HOSTS_FILE_test=/tmp/known_hosts",
+		"SSH_SELECT_KNOWN_HOSTS_FILE_test=testdata/test1.hosts",
 	}
 	err := unit.ParseEnv(input)
 
 	assert.Nil(t, err, "parsing without errors")
 	assert.True(t, unit.NoSearch, "automated search is disabled")
 	assert.Equal(t, "/opt/bin/ssh", unit.SshBinary, "custom SSH path")
-	assert.Subset(t, unit.KnownHostsFiles, []string{"/tmp/known_hosts"}, "custom known hosts file")
+	assert.Subset(t, unit.KnownHostsFiles, []string{"testdata/test1.hosts"}, "custom known hosts file")
 }

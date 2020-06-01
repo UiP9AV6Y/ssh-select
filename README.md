@@ -38,9 +38,19 @@ disables the automated import from well known host
 sources, but adds the */etc/hosts* file back into
 the selection.
 
-`ssh-select --zone /var/lib/bind/zones/db.`
+`ssh-select --zone /var/named/example.com.zone`
 
 reads hostnames from the provided [zone file][].
+
+`ssh-select --zone '/var/lib/bind/**/db.*'`
+
+use hostnames from each [zone file][] the glob pattern
+resolves to.
+
+> **NOTE**: when using globs, wrap the argument in
+> quotes to prevent the shell from expanding it,
+> which would cause only a single file to be
+> used as input and the rest as `ssh` arguments
 
 `ssh-select -i /tmp/id_rsa
 
@@ -69,15 +79,17 @@ environment variables:
 
   path to a [known_hosts][] file. can be specified
   multiple times. duplicate hosts are filtered.
+  supports [glob patterns][].
 * **--hosts**
 
   path to a [hosts file][]. can be specified
   multiple times. duplicate hosts are filtered.
+  supports [glob patterns][].
 * **--zone**
 
   path to a domain name [zone file][]. can be
   specified multiple times. duplicate hosts are
-  filtered.
+  filtered. supports [glob patterns][].
 
   currently only the following resource records
   are processed:
@@ -123,3 +135,4 @@ are prefixed with *SSH_SELECT_*:
 [known_hosts]: http://man.openbsd.org/sshd.8#SSH_KNOWN_HOSTS_FILE_FORMAT
 [hosts file]: http://www.tldp.org/LDP/solrhe/Securing-Optimizing-Linux-RH-Edition-v1.3/chap9sec95.html
 [zone file]: https://tools.ietf.org/html/rfc1035
+[glob patterns]: https://github.com/bmatcuk/doublestar#patterns

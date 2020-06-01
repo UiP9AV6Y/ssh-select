@@ -3,6 +3,7 @@ module github.com/UiP9AV6Y/ssh-select
 go 1.14
 
 require (
+	github.com/bmatcuk/doublestar v1.3.1
 	github.com/c-bata/go-prompt v0.2.4-0.20200228080431-05d87ebe0ef2
 	github.com/golangci/golangci-lint v1.24.0
 	github.com/mattn/go-runewidth v0.0.8 // indirect
