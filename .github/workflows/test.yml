@@ -8,17 +8,13 @@ on:
     branches:
       - master
 
-env:
-  INPUT_GO_VERSION: 1.14
-
 jobs:
   build:
     name: Build ${{ matrix.platform }}/${{ matrix.arch }}
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        compiler: [1.14]
     steps:
       - uses: actions/setup-go@v2
+        with:
+          go-version: '1.14'
       - uses: actions/checkout@v2
       - run: make lint test build
