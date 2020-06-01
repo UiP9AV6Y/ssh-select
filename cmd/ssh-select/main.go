@@ -32,6 +32,11 @@ func newProviders(cli *cli.Parser) []provider.HostProvider {
 		providers = append(providers, provider)
 	}
 
+	for _, file := range cli.ZoneFiles {
+		provider := provider.NewZoneFileProvider(file)
+		providers = append(providers, provider)
+	}
+
 	return providers
 }
 

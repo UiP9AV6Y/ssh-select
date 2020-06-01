@@ -38,12 +38,11 @@ disables the automated import from well known host
 sources, but adds the */etc/hosts* file back into
 the selection.
 
-`ssh-select my.host.local`
+`ssh-select --zone /var/lib/bind/zones/db.`
 
-starts the wrapper with the input prompt already
-populated.
+reads hostnames from the provided [zone file][].
 
-`ssh-select -i /tmp/id_rsa user@remote.host.local`
+`ssh-select -i /tmp/id_rsa
 
 arguments not supported by `ssh-select` will be
 forwarded to `ssh` as-is.
@@ -74,6 +73,16 @@ environment variables:
 
   path to a [hosts file][]. can be specified
   multiple times. duplicate hosts are filtered.
+* **--zone**
+
+  path to a domain name [zone file][]. can be
+  specified multiple times. duplicate hosts are
+  filtered.
+
+  currently only the following resource records
+  are processed:
+
+  *PTR*, *A*, *AAAA*, *CNAME*, *MX*, *NS*
 * **--no-search**
 
   omit adding hosts from well-known file locations.
@@ -105,6 +114,12 @@ are prefixed with *SSH_SELECT_*:
   environment variables with this prefix have the
   same effect as **--hosts**; the suffix has
   no effect on the result.
+* **SSH_SELECT_ZONE_FILE_$**
+
+  environment variables with this prefix have the
+  same effect as **--zone**; the suffix has
+  no effect on the result.
 
 [known_hosts]: http://man.openbsd.org/sshd.8#SSH_KNOWN_HOSTS_FILE_FORMAT
 [hosts file]: http://www.tldp.org/LDP/solrhe/Securing-Optimizing-Linux-RH-Edition-v1.3/chap9sec95.html
+[zone file]: https://tools.ietf.org/html/rfc1035
