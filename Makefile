@@ -105,6 +105,15 @@ install: build
 release-tag:
 	git tag -a -m "Release of $(VERSION)" $(VERSION)
 
+.PHONY: github-workflow-commands
+github-workflow-commands:
+	@echo ::set-output name=project_name::$(PROJECT_NAME)
+	@echo ::set-output name=version::$(VERSION)
+	@echo ::set-output name=commit::$(COMMIT)
+	@echo ::set-output name=target_os::$(GOOS)
+	@echo ::set-output name=target_arch::$(GOARCH)
+	@echo ::add-path::$(GOBIN)
+
 $(GOBIN)/%:
 	# go install -v -tags tools ./...
 	- grep '_ "' tools/tools.go | \
