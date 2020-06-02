@@ -6,7 +6,7 @@ import (
 	"strings"
 	"syscall"
 
-	prompt "github.com/c-bata/go-prompt"
+	"github.com/c-bata/go-prompt"
 
 	"github.com/UiP9AV6Y/ssh-select/pkg/search"
 	"github.com/UiP9AV6Y/ssh-select/pkg/util"

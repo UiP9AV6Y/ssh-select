@@ -1,10 +1,11 @@
 package search
 
 import (
-	"github.com/stretchr/testify/assert"
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type element struct {
