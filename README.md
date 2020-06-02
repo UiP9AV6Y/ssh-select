@@ -52,7 +52,13 @@ resolves to.
 > which would cause only a single file to be
 > used as input and the rest as `ssh` arguments
 
-`ssh-select -i /tmp/id_rsa
+`ssh-select --named-dump /var/lib/bind/named_dump.db`
+
+reads hostnames from the Bind zone [dump file][].
+The file is usually generated using [rndc][]
+(e.g. `rndc dumpdb -zones`)
+
+`ssh-select -i /tmp/id_rsa`
 
 arguments not supported by `ssh-select` will be
 forwarded to `ssh` as-is.
@@ -88,6 +94,15 @@ environment variables:
 * **--zone**
 
   path to a domain name [zone file][]. can be
+  specified multiple times. duplicate hosts are
+  filtered. supports [glob patterns][].
+
+  currently only the following resource records
+  are processed:
+
+  *PTR*, *A*, *AAAA*, *CNAME*, *MX*, *NS*
+* **--named-dump**
+  path to a Bind zone [dump file][]. can be
   specified multiple times. duplicate hosts are
   filtered. supports [glob patterns][].
 
@@ -137,8 +152,15 @@ are prefixed with *SSH_SELECT_*:
   environment variables with this prefix have the
   same effect as **--zone**; the suffix has
   no effect on the result.
+* **SSH_SELECT_NAMED_DUMP_$**
+
+  environment variables with this prefix have the
+  same effect as **--named-dump**; the suffix has
+  no effect on the result.
 
 [known_hosts]: http://man.openbsd.org/sshd.8#SSH_KNOWN_HOSTS_FILE_FORMAT
 [hosts file]: http://www.tldp.org/LDP/solrhe/Securing-Optimizing-Linux-RH-Edition-v1.3/chap9sec95.html
 [zone file]: https://tools.ietf.org/html/rfc1035
 [glob patterns]: https://github.com/bmatcuk/doublestar#patterns
+[dump file]: https://bind.isc.org/doc/arm/9.11/Bv9ARM.ch06.html#zonefile_format
+[rndc]: https://bind.isc.org/doc/arm/9.11/man.rndc.html

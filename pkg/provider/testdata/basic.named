@@ -1,0 +1,35 @@
+;
+; Start view _default
+;
+;
+; Zone dump of 'example.com/IN'
+;
+example.com.                                  86400 IN SOA      ns01.example.com. hostmaster.example.com. 1970010101 86400 3600 604800 3600
+example.com.                                  86400 IN NS       ns01.example.com.
+*.services.example.com.                       86400 IN CNAME    kubernetes.example.com.
+www.example.com.                              86400 IN CNAME    example.com.
+ns01.example.com.                             86400 IN A        10.1.1.1
+mail.example.com.                             86400 IN A        10.1.1.1
+txt.example.com.                              3600 IN TXT       "\"txtvers=1\" \"hello=world\"
+example.com.                                  86400 IN MX       10 mail.example.com.
+1.1.1.10.in-addr.arpa.                        86400 IN PTR      node01.example.com.
+;
+; Start view _bind
+;
+;
+; Zone dump of 'authors.bind/CH'
+;
+; not implemented
+;
+; Zone dump of 'hostname.bind/CH'
+;
+; not implemented
+;
+; Zone dump of 'version.bind/CH'
+;
+; not implemented
+;
+; Zone dump of 'id.server/CH'
+;
+; not implemented
+; Dump complete

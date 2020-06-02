@@ -17,6 +17,7 @@ type Parser struct {
 	SshBinary       string
 	Application     string
 	ZoneFiles       []string
+	NamedDumps      []string
 	HostsFiles      []string
 	KnownHostsFiles []string
 	SshArgv         []string
@@ -31,6 +32,7 @@ const (
 	optArgKnownHostsFile
 	optArgHostsFile
 	optArgZoneFile
+	optArgNamedDump
 )
 const envVarPrefix = "SSH_SELECT_"
 
@@ -40,6 +42,7 @@ var optArgNames = []string{
 	"known hosts file",
 	"hosts file",
 	"zone file",
+	"named dump",
 }
 
 func (o optArg) String() string {
@@ -89,6 +92,8 @@ func (p *Parser) parseOpt(value string) (optArg, error) {
 		return optArgHostsFile, nil
 	case "--zone":
 		return optArgZoneFile, nil
+	case "--named-dump":
+		return optArgNamedDump, nil
 	default:
 		p.SshArgv = append(p.SshArgv, value)
 	}
@@ -111,6 +116,8 @@ func (p *Parser) parseOptArg(optArg optArg, value string) (bool, error) {
 		return true, p.appendFileGlob(value, &p.HostsFiles)
 	case optArgZoneFile:
 		return true, p.appendFileGlob(value, &p.ZoneFiles)
+	case optArgNamedDump:
+		return true, p.appendFileGlob(value, &p.NamedDumps)
 	}
 
 	return false, nil
@@ -155,6 +162,8 @@ func (p *Parser) parseEnvArg(key, value string) (err error) {
 		return p.appendFileGlob(value, &p.HostsFiles)
 	case strings.HasPrefix(key, "ZONE_FILE_"):
 		return p.appendFileGlob(value, &p.ZoneFiles)
+	case strings.HasPrefix(key, "NAMED_DUMP_"):
+		return p.appendFileGlob(value, &p.NamedDumps)
 	}
 
 	return nil

@@ -37,6 +37,11 @@ func newProviders(cli *cli.Parser) []provider.HostProvider {
 		providers = append(providers, provider)
 	}
 
+	for _, file := range cli.NamedDumps {
+		provider := provider.NewNamedDumpProvider(file, false)
+		providers = append(providers, provider)
+	}
+
 	return providers
 }
 
