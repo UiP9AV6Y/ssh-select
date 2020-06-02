@@ -3,7 +3,6 @@ package remote
 import (
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 	"syscall"
 
@@ -72,11 +71,7 @@ func (c *SshClient) CmdArray(host *Host, full bool) []string {
 	}
 
 	if host != nil {
-		if 0 < host.Port {
-			s = append(s, "-p", strconv.Itoa(host.Port))
-		}
-
-		s = append(s, host.String())
+		s = append(s, host.CommandlineArgs(true)...)
 	} else {
 		s = append(s, "")
 	}

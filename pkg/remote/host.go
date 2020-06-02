@@ -10,13 +10,18 @@ import (
 )
 
 type Host struct {
-	User string
-	Host string
-	Port int
+	User     string
+	Host     string
+	Port     int
+	JumpUser string
+	JumpHost string
+	JumpPort int
+	KeyFile  string
+	Options  []string
 }
 
 func (h *Host) String() string {
-	if "" != h.User {
+	if h.User != "" {
 		return fmt.Sprintf("%s@%s", h.User, h.Host)
 	}
 
@@ -27,6 +32,50 @@ func (h *Host) Suggest() prompt.Suggest {
 	return prompt.Suggest{
 		Text: h.Host,
 	}
+}
+
+func (h *Host) JumpProxy() string {
+	proxy := h.JumpHost
+
+	if h.JumpHost == "" {
+		return proxy
+	}
+
+	if h.JumpUser != "" {
+		proxy = h.JumpUser + "@" + h.JumpHost
+	}
+
+	if h.JumpPort > 0 {
+		proxy = proxy + ":" + strconv.Itoa(h.JumpPort)
+	}
+
+	return proxy
+}
+
+func (h *Host) CommandlineArgs(includeHost bool) []string {
+	argv := []string{}
+
+	if h.Port > 0 {
+		argv = append(argv, "-p", strconv.Itoa(h.Port))
+	}
+
+	if proxy := h.JumpProxy(); proxy != "" {
+		argv = append(argv, "-J", proxy)
+	}
+
+	if h.KeyFile != "" {
+		argv = append(argv, "-i", h.KeyFile)
+	}
+
+	for _, option := range h.Options {
+		argv = append(argv, "-o", option)
+	}
+
+	if includeHost {
+		argv = append(argv, h.String())
+	}
+
+	return argv
 }
 
 func NewSimpleHost(addr string) Host {

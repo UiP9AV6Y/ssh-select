@@ -1,6 +1,117 @@
 package remote
 
-import "testing"
+import (
+	"strings"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestString(t *testing.T) {
+	testCases := map[string]Host{
+		"unit.test": {
+			Host: "unit.test",
+		},
+		"port.test": {
+			Host: "port.test",
+			Port: 233,
+		},
+		"user@unit.test": {
+			Host: "unit.test",
+			User: "user",
+		},
+		"user@port.test": {
+			Host: "port.test",
+			User: "user",
+			Port: 233,
+		},
+	}
+
+	for expected, unit := range testCases {
+		assert.Equal(t, expected, unit.String(), "string rendering")
+	}
+}
+
+func TestCommandlineArgs(t *testing.T) {
+	testCases := map[string]Host{
+		"unit.test": {
+			Host: "unit.test",
+		},
+		"-p 233 unit.test": {
+			Host: "unit.test",
+			Port: 233,
+		},
+		"-J proxy.test unit.test": {
+			Host:     "unit.test",
+			JumpHost: "proxy.test",
+		},
+		"-J user@proxy.test unit.test": {
+			Host:     "unit.test",
+			JumpHost: "proxy.test",
+			JumpUser: "user",
+		},
+		"-J proxy.test:233 unit.test": {
+			Host:     "unit.test",
+			JumpHost: "proxy.test",
+			JumpPort: 233,
+		},
+		"-J user@proxy.test:233 unit.test": {
+			Host:     "unit.test",
+			JumpUser: "user",
+			JumpHost: "proxy.test",
+			JumpPort: 233,
+		},
+		"-i /tmp/id_rsa unit.test": {
+			Host:    "unit.test",
+			KeyFile: "/tmp/id_rsa",
+		},
+		"-o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null unit.test": {
+			Host: "unit.test",
+			Options: []string{
+				"UserKnownHostsFile=/dev/null",
+				"GlobalKnownHostsFile=/dev/null",
+			},
+		},
+	}
+
+	for expected, unit := range testCases {
+		argv := strings.Join(unit.CommandlineArgs(true), " ")
+
+		assert.Equal(t, expected, argv, "command line argument rendering")
+	}
+}
+
+func TestJumpProxy(t *testing.T) {
+	testCases := map[string]Host{
+		"": {
+			Host: "unit.test",
+		},
+		"jump.host": {
+			Host:     "unit.test",
+			JumpHost: "jump.host",
+		},
+		"jump.host:2200": {
+			Host:     "unit.test",
+			JumpHost: "jump.host",
+			JumpPort: 2200,
+		},
+		"user@jump.host": {
+			Host:     "unit.test",
+			JumpUser: "user",
+			JumpHost: "jump.host",
+		},
+		"user@jump.host:2200": {
+			Host:     "unit.test",
+			JumpUser: "user",
+			JumpHost: "jump.host",
+			JumpPort: 2200,
+		},
+	}
+
+	for expected, unit := range testCases {
+		assert.Equal(t, expected, unit.JumpProxy(), "jump host rendering")
+	}
+}
 
 func TestParseHostError(t *testing.T) {
 	testCases := []string{
@@ -101,5 +212,31 @@ func compare(t *testing.T, want, got *Host) {
 
 	if want.Host != got.Host {
 		t.Errorf("got Host=%q; want %q", got.Host, want.Host)
+	}
+
+	if want.JumpUser != got.JumpUser {
+		t.Errorf("got JumpUser=%q; want %q", got.JumpUser, want.JumpUser)
+	}
+
+	if want.JumpHost != got.JumpHost {
+		t.Errorf("got JumpHost=%q; want %q", got.JumpHost, want.JumpHost)
+	}
+
+	if want.JumpPort != got.JumpPort {
+		t.Errorf("got JumpPort=%q; want %q", got.JumpPort, want.JumpPort)
+	}
+
+	if want.KeyFile != got.KeyFile {
+		t.Errorf("got KeyFile=%q; want %q", got.KeyFile, want.KeyFile)
+	}
+
+	if len(want.Options) != len(got.Options) {
+		t.Fatalf("got %d options; want %d options", len(got.Options), len(want.Options))
+	}
+
+	for i, actual := range got.Options {
+		if want.Options[i] != actual {
+			t.Errorf("got Option=%q; want %q", actual, want.Options[i])
+		}
 	}
 }
