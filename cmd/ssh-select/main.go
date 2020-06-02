@@ -144,7 +144,7 @@ func main() {
 
 	client = remote.NewSshClient(cmd, parser.SshArgv, parser.Environment)
 	complete = completer.NewCompleter(lookup)
-	executor = client.NewExecutor(lookup, false)
+	executor = client.NewExecutor(lookup, parser.NoOp)
 	suggestions = complete.NewSuggestions()
 	choice = prompt.New(
 		executor,

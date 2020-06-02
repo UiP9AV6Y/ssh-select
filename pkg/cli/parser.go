@@ -13,6 +13,7 @@ type Parser struct {
 	Help            bool
 	Quiet           bool
 	NoSearch        bool
+	NoOp            bool
 	SshBinary       string
 	Application     string
 	ZoneFiles       []string
@@ -78,6 +79,8 @@ func (p *Parser) parseOpt(value string) (optArg, error) {
 		p.Quiet = true
 	case "--no-search":
 		p.NoSearch = true
+	case "--no-op":
+		p.NoOp = true
 	case "--ssh":
 		return optArgSshBinary, nil
 	case "--known-hosts":
@@ -138,6 +141,8 @@ func (p *Parser) parseEnvArg(key, value string) (err error) {
 	}
 
 	switch {
+	case key == "NO_OP":
+		p.NoOp = true
 	case key == "NO_SEARCH":
 		p.NoSearch = true
 	case key == "QUIET":
